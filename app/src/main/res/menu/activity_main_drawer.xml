@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+        <item android:title="Github required">
+            <menu>
+                <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_github"
+                    android:icon="@drawable/ic_menu_github"
+                    android:title="Login/Logout"
+                    android:checked="true"/>
+                <item
+                    android:id="@+id/nav_reposits"
+                    android:icon="@drawable/ic_menu_reposits"
+                    android:title="Repositories" />
+                </group>
+            </menu>
+        </item>
+        <item android:title="Optional">
+            <menu>
+                <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_info"
+                    android:icon="@drawable/ic_menu_info"
+                    android:title="Information"
+                    />
+                <item
+                    android:id="@+id/nav_map"
+                    android:icon="@drawable/ic_menu_map"
+                    android:title="Map"/>
+                <item
+                    android:id="@+id/nav_contacts"
+                    android:icon="@drawable/ic_menu_contacts"
+                    android:title="Contacts" />
+                <item
+                    android:id="@+id/nav_sensor"
+                    android:icon="@drawable/ic_menu_sensor"
+                    android:title="Sensor" />
+                </group>
+            </menu>
+        </item>
+</menu>
