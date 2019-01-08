@@ -1,10 +1,8 @@
 package com.alena.s__tforuniversity.GitHub;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,10 +14,6 @@ import com.alena.s__tforuniversity.R;
 
 import java.util.ArrayList;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class RepositoriesFragment extends ListFragment {
 
     public RepositoriesFragment() {

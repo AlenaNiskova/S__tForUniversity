@@ -1,7 +1,5 @@
 package com.alena.s__tforuniversity.GitHub;
 
-import android.view.View;
-
 import java.util.ArrayList;
 
 public class GitHubPresenter {

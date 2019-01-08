@@ -1,48 +1,69 @@
 package com.alena.s__tforuniversity;
 
-
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SensorFragment extends Fragment {
 
     SensorManager sm;
     Sensor accelero;
-    TextView s_x, s_y, s_z;
     float[] values = new float[3];
 
-    public SensorFragment() {
-        // Required empty public constructor
-    }
+    TextView s_x, s_y, s_z;
+    ImageView image;
+    Button make, save;
 
+    public SensorFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_sensor, container, false);
 
         s_x = (TextView) v.findViewById(R.id.sensor_x);
         s_y = (TextView) v.findViewById(R.id.sensor_y);
         s_z = (TextView) v.findViewById(R.id.sensor_z);
+        make = (Button) v.findViewById(R.id.make_photo);
+        make.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    onMakeClick();
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.CAMERA},
+                            MainActivity.REQUEST_CAMERA);
+                }
+            }
+        });
+        save = (Button) v.findViewById(R.id.save_photo);
+        image = (ImageView) v.findViewById(R.id.photo);
 
         sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         accelero = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         return v;
+    }
+
+    public void onMakeClick() {
+
     }
 
     @Override
@@ -71,7 +92,6 @@ public class SensorFragment extends Fragment {
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int i) {
-
         }
     };
 

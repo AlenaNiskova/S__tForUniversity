@@ -1,10 +1,14 @@
 package com.alena.s__tforuniversity;
 
-import android.content.Context;
-import android.net.Uri;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alena.s__tforuniversity.GitHub.GitHubFragment;
 import com.alena.s__tforuniversity.GitHub.RepositoriesFragment;
@@ -27,16 +32,16 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
     private DrawerLayout Drawer;
     private Toolbar toolbar;
     private NavigationView NaviView;
-
-    private static final int REQUEST_CODE_READ_CONTACTS=1;
-    private static boolean READ_CONTACTS_GRANTED = false;
     private ArrayList<String> repos = new ArrayList<>();
     private Fragment gitHub, was;
-    private boolean isRepos = false;
+    private boolean isRepos = false, isSens = false;
     private RepositoriesFragment ReposFrag;
+    private SensorFragment SensFrag;
     private TextView login_view;
-
     MenuItem mi;
+
+    public static final int REQUEST_READ_CONTACTS = 1;
+    public static final int REQUEST_CAMERA = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,46 +102,85 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        // Создать новый фрагмент и задать фрагмент для отображения
-        // на основе нажатия на элемент навигации
-        Fragment fragment = null;
         Class fragmentClass;
-
+        mi = menuItem;
 
         switch(menuItem.getItemId()) {
-            case R.id.nav_github:
+            case R.id.nav_github: {
                 fragmentClass = GitHubFragment.class;
-                break;
-            case R.id.nav_reposits: {
-                fragmentClass = RepositoriesFragment.class;
+                PermissionGranted(fragmentClass, menuItem);
                 break;
             }
-            case R.id.nav_info:
+            case R.id.nav_reposits: {
+                fragmentClass = RepositoriesFragment.class;
+                PermissionGranted(fragmentClass, menuItem);
+                break;
+            }
+            case R.id.nav_info: {
                 fragmentClass = InfoFragment.class;
+                PermissionGranted(fragmentClass, menuItem);
                 break;
-            case R.id.nav_map:
+            }
+            case R.id.nav_map: {
                 fragmentClass = MapFragment.class;
+                PermissionGranted(fragmentClass, menuItem);
                 break;
-            case R.id.nav_contacts:
+            }
+            case R.id.nav_contacts: {
                 fragmentClass = ContactsFragment.class;
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    PermissionGranted(fragmentClass, menuItem);
+                } else {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            REQUEST_READ_CONTACTS);
+                }
                 break;
-            case R.id.nav_sensor:
+            }
+            case R.id.nav_sensor: {
                 fragmentClass = SensorFragment.class;
+                PermissionGranted(fragmentClass, menuItem);
                 break;
-            default:
+            }
+            default: {
                 fragmentClass = GitHubFragment.class;
+                PermissionGranted(fragmentClass, menuItem);
+            }
         }
+    }
 
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_CONTACTS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    PermissionGranted(ContactsFragment.class, mi);
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.contacts_permission, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0,0);
+                    toast.show();
+                }
+                break;
+            }
+            case REQUEST_CAMERA: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SensFrag.onMakeClick();
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.camera_permission, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0,0);
+                    toast.show();
+                }
+                break;
+            }
         }
+    }
 
-        // Вставить фрагмент, заменяя любой существующий
+    public void PermissionGranted(Class fragmentClass, MenuItem menuItem) {
         FragmentTransaction fTrans = getSupportFragmentManager().beginTransaction();
-        if (was == gitHub || was == ReposFrag) {
+        if (was == gitHub || was == ReposFrag || was == SensFrag) {
             fTrans.hide(was);
         }
         else {
@@ -157,7 +201,23 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
                 fTrans.add(R.id.flContent, ReposFrag);
                 was = ReposFrag;
             }
+        } else if (fragmentClass==SensorFragment.class) {
+            if (isSens) {
+                fTrans.show(SensFrag);
+                was = SensFrag;
+            } else {
+                isSens=true;
+                SensFrag = new SensorFragment();
+                fTrans.add(R.id.flContent, SensFrag);
+                was = SensFrag;
+            }
         } else {
+            Fragment fragment = null;
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             fTrans.add(R.id.flContent, fragment);
             was = fragment;
         }

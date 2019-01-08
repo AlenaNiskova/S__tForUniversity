@@ -3,7 +3,6 @@ package com.alena.s__tforuniversity.GitHub;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,8 +52,6 @@ public class GitHubFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_git_hub, container, false);
-
-        Log.d("MyLog" ,"onCreateViewGit");
 
         login = (EditText) v.findViewById(R.id.login);
         first_step = (LinearLayout) v.findViewById(R.id.first_step);
@@ -141,7 +138,6 @@ public class GitHubFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d("MyLog", "onDestroyViewGit");
         gitHubPresenter.detachView();
     }
 }

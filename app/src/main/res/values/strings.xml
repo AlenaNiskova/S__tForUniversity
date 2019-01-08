@@ -7,6 +7,10 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="repos_is_empty">Требуется авторизация в GitHub</string>
+    <string name="make_photo">Сделать снимок</string>
+    <string name="save_photo">Сохранить снимок</string>
+    <string name="contacts_permission">Для доступа к контактам требуется разрешение!</string>
+    <string name="camera_permission">Для доступа к камере требуется разрешение!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
