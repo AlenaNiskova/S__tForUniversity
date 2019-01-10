@@ -18,6 +18,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alena.s__tforuniversity.GitHub.GitHubFragment;
+
+import java.util.ArrayList;
+
 public class SensorFragment extends Fragment {
 
     SensorManager sm;
@@ -29,6 +33,24 @@ public class SensorFragment extends Fragment {
     Button make, save;
 
     public SensorFragment() {
+    }
+
+    private OnFragmentInteractionListener mListener;
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void checkPermission();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -43,14 +65,7 @@ public class SensorFragment extends Fragment {
         make.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    onMakeClick();
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.CAMERA},
-                            MainActivity.REQUEST_CAMERA);
-                }
+                mListener.checkPermission();
             }
         });
         save = (Button) v.findViewById(R.id.save_photo);
@@ -94,5 +109,11 @@ public class SensorFragment extends Fragment {
         public void onAccuracyChanged(Sensor sensor, int i) {
         }
     };
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
 
 }

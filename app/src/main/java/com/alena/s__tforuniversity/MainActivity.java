@@ -27,7 +27,7 @@ import com.alena.s__tforuniversity.GitHub.RepositoriesFragment;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements GitHubFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements GitHubFragment.OnFragmentInteractionListener, SensorFragment.OnFragmentInteractionListener {
 
     private DrawerLayout Drawer;
     private Toolbar toolbar;
@@ -88,6 +88,18 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
     @Override
     public void loadRepos(ArrayList<String> reps) {
         repos = reps;
+    }
+
+    @Override
+    public void checkPermission() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            SensFrag.onMakeClick();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    REQUEST_CAMERA);
+        }
     }
 
     private void setupDrawerContent(NavigationView navigationView) {

@@ -140,4 +140,10 @@ public class GitHubFragment extends Fragment {
         super.onDestroyView();
         gitHubPresenter.detachView();
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
 }
