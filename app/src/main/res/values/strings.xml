@@ -11,6 +11,7 @@
     <string name="save_photo">Сохранить снимок</string>
     <string name="contacts_permission">Для доступа к контактам требуется разрешение!</string>
     <string name="camera_permission">Для доступа к камере требуется разрешение!</string>
+    <string name="storage_permission">Для доступа к памяти устройства требуется разрешение!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

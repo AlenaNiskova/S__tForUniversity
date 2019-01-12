@@ -1,16 +1,22 @@
 package com.alena.s__tforuniversity;
 
-import android.Manifest;
+import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +24,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.alena.s__tforuniversity.GitHub.GitHubFragment;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
-import java.util.ArrayList;
+import static android.app.Activity.RESULT_OK;
+import static android.support.v4.content.FileProvider.getUriForFile;
 
 public class SensorFragment extends Fragment {
 
@@ -38,9 +47,13 @@ public class SensorFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void checkPermission();
+        void checkCamera();
+        void checkStorage();
     }
+
+    private static final int CAMERA_REQUEST = 0;
+    private Uri selectedPhotoPath = null;
+    private Bitmap bitmap;
 
     @Override
     public void onAttach(Context context) {
@@ -65,10 +78,16 @@ public class SensorFragment extends Fragment {
         make.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.checkPermission();
+                mListener.checkCamera();
             }
         });
         save = (Button) v.findViewById(R.id.save_photo);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.checkStorage();
+            }
+        });
         image = (ImageView) v.findViewById(R.id.photo);
 
         sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
@@ -77,8 +96,74 @@ public class SensorFragment extends Fragment {
         return v;
     }
 
-    public void onMakeClick() {
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), selectedPhotoPath);
+                image.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void onMakeClick() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File imagePath = new File(getContext().getCacheDir(), "img");
+        imagePath.mkdirs(); //create folders where write files
+        File newFile = null;
+        try {
+            newFile = File.createTempFile("default_image", ".jpg", imagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        selectedPhotoPath = getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".fileprovider", newFile);
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedPhotoPath);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            ClipData clip = ClipData.newUri(getContext().getContentResolver(), "A photo", selectedPhotoPath);
+            intent.setClipData(clip);
+        }
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivityForResult(intent, CAMERA_REQUEST);
+    }
+
+    public void onSaveClick() {
+
+        OutputStream fOut = null;
+        Time time = new Time();
+        time.setToNow();
+        File file = new File(Environment.getExternalStorageDirectory().toString(), "UniversityS__t");
+        file.mkdirs();
+
+        String name = Integer.toString(time.year) + Integer.toString(time.month+1)
+                + Integer.toString(time.monthDay) + Integer.toString(time.hour)
+                + Integer.toString(time.minute) + Integer.toString(time.second) +".jpg";
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, name);
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, name);
+        values.put(MediaStore.Images.Media.DESCRIPTION, name);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis()/1000);
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+
+        try {
+            Uri url = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            fOut = getContext().getContentResolver().openOutputStream(url);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -31,7 +31,6 @@ public class GitHubFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void loadRepos(ArrayList<String> reps);
         void loadLogin(String login);
     }

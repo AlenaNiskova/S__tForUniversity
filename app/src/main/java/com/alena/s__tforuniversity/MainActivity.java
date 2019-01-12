@@ -40,8 +40,9 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
     private TextView login_view;
     MenuItem mi;
 
-    public static final int REQUEST_READ_CONTACTS = 1;
-    public static final int REQUEST_CAMERA = 2;
+    public static final int REQUEST_READ_CONTACTS = 0;
+    public static final int REQUEST_CAMERA = 1;
+    public static final int REQUEST_STORAGE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
     }
 
     @Override
-    public void checkPermission() {
+    public void checkCamera() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             SensFrag.onMakeClick();
@@ -99,6 +100,19 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     REQUEST_CAMERA);
+        }
+    }
+
+    @Override
+    public void checkStorage() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            SensFrag.onSaveClick();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_STORAGE);
         }
     }
 
@@ -182,6 +196,18 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
                     SensFrag.onMakeClick();
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.camera_permission, Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0,0);
+                    toast.show();
+                }
+                break;
+            }
+            case REQUEST_STORAGE: {
+                if (grantResults.length > 1
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    SensFrag.onSaveClick();
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.storage_permission, Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, 0,0);
                     toast.show();
                 }
