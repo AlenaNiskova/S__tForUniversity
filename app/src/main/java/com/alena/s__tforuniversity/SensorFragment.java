@@ -37,7 +37,7 @@ public class SensorFragment extends Fragment {
     Sensor accelero;
     float[] values = new float[3];
 
-    TextView s_x, s_y, s_z;
+    TextView s_x, s_y, s_z, photo;
     ImageView image;
     Button make, save;
 
@@ -88,7 +88,9 @@ public class SensorFragment extends Fragment {
                 mListener.checkStorage();
             }
         });
+        photo = (TextView) v.findViewById(R.id.text_photo);
         image = (ImageView) v.findViewById(R.id.photo);
+        image.setImageResource(0);
 
         sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         accelero = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -104,18 +106,20 @@ public class SensorFragment extends Fragment {
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), selectedPhotoPath);
-                image.setImageBitmap(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            image.setImageURI(selectedPhotoPath);
         }
     }
 
     public void onMakeClick() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File imagePath = new File(getContext().getCacheDir(), "img");
-        imagePath.mkdirs(); //create folders where write files
+        imagePath.mkdirs();
         File newFile = null;
+        photo.setText("");
+
         try {
             newFile = File.createTempFile("default_image", ".jpg", imagePath);
         } catch (IOException e) {
@@ -133,28 +137,15 @@ public class SensorFragment extends Fragment {
     }
 
     public void onSaveClick() {
-
-        OutputStream fOut = null;
-        Time time = new Time();
-        time.setToNow();
-        File file = new File(Environment.getExternalStorageDirectory().toString(), "UniversityS__t");
-        file.mkdirs();
-
-        String name = Integer.toString(time.year) + Integer.toString(time.month+1)
-                + Integer.toString(time.monthDay) + Integer.toString(time.hour)
-                + Integer.toString(time.minute) + Integer.toString(time.second) +".jpg";
-
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, name);
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, name);
-        values.put(MediaStore.Images.Media.DESCRIPTION, name);
+        long time = System.currentTimeMillis();
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis()/1000);
-        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.DATE_ADDED, time/1000);
+        values.put(MediaStore.Images.Media.DATE_TAKEN, time);
 
         try {
             Uri url = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-            fOut = getContext().getContentResolver().openOutputStream(url);
+            OutputStream fOut = getContext().getContentResolver().openOutputStream(url);
 
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
             fOut.flush();
@@ -164,6 +155,11 @@ public class SensorFragment extends Fragment {
         {
             e.printStackTrace();
         }
+        if (bitmap != null) {
+            photo.setText("Фотография сохранена.");
+        }
+        bitmap = null;
+        image.setImageResource(0);
     }
 
     @Override

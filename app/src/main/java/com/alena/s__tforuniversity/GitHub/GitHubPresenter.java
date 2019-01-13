@@ -23,7 +23,7 @@ public class GitHubPresenter {
         } else {
             onSignOutClick();
             sign_in = false;
-            loadRepos(new ArrayList<String>());
+            fragment.getRepos(new ArrayList<String>());
             setLogin("");
         }
     }

@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
     private NavigationView NaviView;
     private ArrayList<String> repos = new ArrayList<>();
     private Fragment gitHub, was;
-    private boolean isRepos = false, isSens = false;
+    private boolean isRepos = false;
     private RepositoriesFragment ReposFrag;
     private SensorFragment SensFrag;
     private TextView login_view;
@@ -218,37 +218,25 @@ public class MainActivity extends AppCompatActivity implements GitHubFragment.On
 
     public void PermissionGranted(Class fragmentClass, MenuItem menuItem) {
         FragmentTransaction fTrans = getSupportFragmentManager().beginTransaction();
-        if (was == gitHub || was == ReposFrag || was == SensFrag) {
+        if (was == gitHub) {
             fTrans.hide(was);
         }
         else {
             fTrans.remove(was);
         }
+        SensFrag = null;
         if (fragmentClass==GitHubFragment.class) {
             fTrans.show(gitHub);
             was = gitHub;
         } else if (fragmentClass==RepositoriesFragment.class) {
-            if (isRepos) {
-                ReposFrag.getRepos(repos, getApplicationContext());
-                fTrans.show(ReposFrag);
-                was = ReposFrag;
-            } else {
-                isRepos=true;
-                ReposFrag = new RepositoriesFragment();
-                ReposFrag.getRepos(repos, getApplicationContext());
-                fTrans.add(R.id.flContent, ReposFrag);
-                was = ReposFrag;
-            }
+            ReposFrag = new RepositoriesFragment();
+            ReposFrag.getRepos(repos, getApplicationContext());
+            fTrans.add(R.id.flContent, ReposFrag);
+            was = ReposFrag;
         } else if (fragmentClass==SensorFragment.class) {
-            if (isSens) {
-                fTrans.show(SensFrag);
-                was = SensFrag;
-            } else {
-                isSens=true;
-                SensFrag = new SensorFragment();
-                fTrans.add(R.id.flContent, SensFrag);
-                was = SensFrag;
-            }
+            SensFrag = new SensorFragment();
+            fTrans.add(R.id.flContent, SensFrag);
+            was = SensFrag;
         } else {
             Fragment fragment = null;
             try {
