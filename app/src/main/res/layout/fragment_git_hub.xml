@@ -74,15 +74,17 @@
         android:textStyle="bold" />
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/sec_step"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:passwordToggleEnabled="true"
         android:visibility="invisible">
 
         <EditText
             android:id="@+id/second_step"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_second_ster"
+            android:hint="@string/prompt_second_step"
             android:imeActionId="6"
             android:imeActionLabel="@string/action_sign_in_short"
             android:imeOptions="actionDone"

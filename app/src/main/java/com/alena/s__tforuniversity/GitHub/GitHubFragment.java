@@ -2,6 +2,7 @@ package com.alena.s__tforuniversity.GitHub;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +24,8 @@ public class GitHubFragment extends Fragment {
     }
 
     private Button button;
-    private EditText login, password, sec_step;
+    private TextInputLayout sec_step;
+    private EditText login, password, second_step;
     private GitHubPresenter gitHubPresenter;
     private LinearLayout first_step;
     public boolean is_sec_step = false;
@@ -55,10 +57,10 @@ public class GitHubFragment extends Fragment {
         login = (EditText) v.findViewById(R.id.login);
         first_step = (LinearLayout) v.findViewById(R.id.first_step);
         password = (EditText) v.findViewById(R.id.password);
-        sec_step = (EditText) v.findViewById(R.id.second_step);
+        sec_step = (TextInputLayout) v.findViewById(R.id.sec_step);
+        second_step = (EditText) v.findViewById(R.id.second_step);
         if (gitHubPresenter == null) {
             gitHubPresenter = new GitHubPresenter(this);
-            gitHubPresenter.attachView(this);
         }
         button = (Button) v.findViewById(R.id.github_button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +93,7 @@ public class GitHubFragment extends Fragment {
         first_step.setVisibility(View.VISIBLE);
         login.setText("");
         password.setText("");
-        sec_step.setText("");
+        second_step.setText("");
         sec_step.setVisibility(View.INVISIBLE);
     }
 
@@ -117,7 +119,7 @@ public class GitHubFragment extends Fragment {
 
     public String getSecAuth() {
         if (is_sec_step) {
-            return sec_step.getText().toString();
+            return second_step.getText().toString();
         }
         else {
             return " ";
@@ -125,19 +127,13 @@ public class GitHubFragment extends Fragment {
     }
 
     public void setLogin(String name) {
-        if (is_sec_step) {
-            sec_step.setText(name);
-        }
-        else {
-            login.setText(name);
-        }
         mListener.loadLogin(name);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        gitHubPresenter.detachView();
+        gitHubPresenter = null;
     }
 
     @Override

@@ -15,7 +15,6 @@ public class GitHubPresenter {
         if (!sign_in) {
             if (!need_sec_step) {
                 onSignInClick();
-                sign_in = true;
             }
             else {
                 onSecStepClick();
@@ -42,6 +41,7 @@ public class GitHubPresenter {
         if (!need_sec_step) {
             if (!isCrashed) {
                 fragment.isSignedIn();
+                sign_in = true;
             }
         } else {
             fragment.isNeedSecStep();
@@ -57,14 +57,6 @@ public class GitHubPresenter {
         fragment.isSignedOut();
     }
 
-    public void attachView(GitHubFragment gitHubFragment) {
-        this.fragment = gitHubFragment;
-    }
-
-    public void detachView() {
-        fragment = null;
-    }
-
     public String getSecAuth() {
         return fragment.getSecAuth();
     }
@@ -78,7 +70,11 @@ public class GitHubPresenter {
     }
 
     public void isSecFactor(boolean b) {
-        need_sec_step = b;
+        if (need_sec_step) {
+            need_sec_step = false;
+        } else {
+            need_sec_step = b;
+        }
         fragment.isSecFactor(b);
     }
 
